@@ -10,9 +10,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/heritechie/cekdulu-link/internal/config"
-	"github.com/heritechie/cekdulu-link/internal/database"
-	"github.com/heritechie/cekdulu-link/internal/link"
+	"github.com/heritechie/cekdu-link/internal/config"
+	"github.com/heritechie/cekdu-link/internal/database"
+	"github.com/heritechie/cekdu-link/internal/link"
 )
 
 func main() {
@@ -45,7 +45,7 @@ func main() {
 	}
 
 	go func() {
-		log.Printf("cekdulu-link listening on %s", cfg.HTTPAddr)
+		log.Printf("cekdu-link listening on %s", cfg.HTTPAddr)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("server error: %v", err)
 		}

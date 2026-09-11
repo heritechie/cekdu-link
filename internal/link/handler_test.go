@@ -5,8 +5,10 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"net"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -29,6 +31,27 @@ type testDeps struct {
 	repo    *Repository
 }
 
+// testDSN builds a postgres DSN with properly escaped components, mirroring
+// config.Config.DatabaseURL.
+func testDSN(user, pass, host, port, dbName string) string {
+	u := &url.URL{
+		Scheme:   "postgres",
+		User:     url.UserPassword(user, pass),
+		Host:     net.JoinHostPort(host, port),
+		Path:     "/" + dbName,
+		RawQuery: "sslmode=disable",
+	}
+	return u.String()
+}
+
+// setupTestDB prepares a real PostgreSQL test database and runs migrations.
+//
+// These are integration tests: when PostgreSQL is unreachable they call
+// t.Skip, so `go test ./...` still works for developers without a database.
+// CI (and any environment where the database is expected to exist) must have
+// PostgreSQL reachable, otherwise integration coverage is silently skipped
+// rather than failing. Connection can be pointed at a non-default instance via
+// TEST_DB_HOST, DB_TEST_PORT, DB_USER, and DB_PASSWORD.
 func setupTestDB(t *testing.T) *testDeps {
 	t.Helper()
 
@@ -51,7 +74,7 @@ func setupTestDB(t *testing.T) *testDeps {
 
 	ctx := context.Background()
 
-	adminDSN := fmt.Sprintf("postgres://%s:%s@%s:%s/postgres?sslmode=disable", user, pass, host, port)
+	adminDSN := testDSN(user, pass, host, port, "postgres")
 	adminPool, err := pgxpool.New(ctx, adminDSN)
 	if err != nil {
 		t.Skipf("postgres not available, skipping integration test: %v", err)
@@ -74,7 +97,7 @@ func setupTestDB(t *testing.T) *testDeps {
 		}
 	}
 
-	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", user, pass, host, port, testDBName)
+	dsn := testDSN(user, pass, host, port, testDBName)
 	pool, err := pgxpool.New(ctx, dsn)
 	if err != nil {
 		t.Fatalf("connect test database: %v", err)

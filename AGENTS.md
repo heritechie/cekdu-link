@@ -110,7 +110,7 @@ Only introduce these when there is a concrete product requirement.
 This project intentionally lives in a separate repository:
 
 ```text
-cekdulu-link
+cekdu-link
 ```
 
 Keep it independently deployable from any consuming application.

@@ -1,4 +1,4 @@
-module github.com/heritechie/cekdulu-link
+module github.com/heritechie/cekdu-link
 
 go 1.24.4
 

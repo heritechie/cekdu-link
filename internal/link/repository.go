@@ -114,7 +114,9 @@ func (r *Repository) Update(ctx context.Context, id uuid.UUID, destinationURL, s
 	if err != nil {
 		return Link{}, fmt.Errorf("begin update link %s: %w", id, err)
 	}
-	defer tx.Rollback(ctx)
+	// Roll back with a detached context so cleanup still runs when the
+	// request context has been cancelled. No-op after a successful Commit.
+	defer tx.Rollback(context.Background())
 
 	l, err := scanLink(tx.QueryRow(ctx,
 		`SELECT `+linkColumns+`

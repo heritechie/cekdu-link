@@ -8,7 +8,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/heritechie/cekdulu-link/internal/config"
+	"github.com/heritechie/cekdu-link/internal/config"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/pressly/goose/v3"
 )
